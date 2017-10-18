@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper    
+     PUBLIC "-//mybatis.org//DTD mapper 3.0//EN"    
+     "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="UserScore">
+	<insert id="save" parameterType="User" useGeneratedKeys="true" keyProperty="id">
+		insert into userScore(userid,roomid,currentGame,score,createDate) values(#{userid},#{roomid},#{currentGame},#{score},#{createDate})
+	</insert>
+	
+	
+	<select id="queryForMap" parameterType="java.util.Map" resultType="UserScore">
+		select * from userScore us where 1 = 1
+		<if test="userid != null ">
+			AND us.userid = #{userid}
+		</if>
+		<if test="sumScoreId != null ">
+			AND us.sumScoreId = #{sumScoreId}
+		</if>
+		order by us.createDate desc 
+	</select>
+	
+	<select id="queryForMapPdk" parameterType="java.util.Map" resultType="UserScore">
+		select * from userScorepdk us where 1 = 1
+		<if test="userid != null ">
+			AND us.userid = #{userid}
+		</if>
+		<if test="roomid != null ">
+			AND us.roomid = #{roomid}
+		</if>
+		order by us.createDate desc 
+	</select>
+	
+	<select id="queryForMapCount" parameterType="java.util.Map" resultType="int">
+		select count(*) from userScore us where 1 = 1
+		<if test="userid != null ">
+			AND us.userid = #{userid}
+		</if>
+		<if test="roomid != null ">
+			AND us.roomid = #{roomid}
+		</if>
+		order by us.createDate desc 
+	</select>
+	
+	<select id="queryForMapCountPdk" parameterType="java.util.Map" resultType="int">
+		select count(*) from userScorepdk us where 1 = 1
+		<if test="userid != null ">
+			AND us.userid = #{userid}
+		</if>
+		<if test="roomid != null ">
+			AND us.roomid = #{roomid}
+		</if>
+		order by us.createDate desc 
+	</select>
+	
+	
+	
+	<select id="querySumForMap" parameterType="java.util.Map" resultType="java.util.LinkedHashMap">
+		SELECT ss.userid,ss.finalScore,ss.createDate,u.nickName,ss.roomNumber,ss.fangZhu,IFNULL(ss.total,2) total
+		from sumScore ss 
+		join user u on u.id = ss.userid
+		where ss.roomNumber in(
+				SELECT m.roomNumber from 
+				(
+					SELECT ss.userid,ss.roomNumber from sumScore ss 
+					where 
+						ss.userid = #{userid}
+					ORDER BY ss.id desc
+					LIMIT #{pageIndex},#{pageSize} 
+				)m
+		)AND ss.createDate = (
+				SELECT ss.createDate from sumScore ss 
+					where 
+						ss.userid = #{userid}
+					ORDER BY ss.id desc
+					LIMIT #{pageIndex},#{pageSize}  
+		)
+		ORDER BY ss.createDate DESC LIMIT #{totalSize}
+	</select>
+	<select id="querySumScore" parameterType="java.util.Map" resultType="java.util.LinkedHashMap">
+		select ss.id,sss.userid,sss.finalScore,sss.roomNumber,sss.createDate,sss.total,sss.nickName
+		from sumScore sss,
+			(select s.id,s.createDate from sumScore s where 1=1 
+					<if test="userid != null ">
+						AND userid = #{userid} order by s.createDate desc
+					</if>
+					limit #{pageIndex},#{pageSize}
+			) ss
+		where sss.createDate =  ss.createDate	
+	</select>
+	
+	
+	
+	<select id="querySumForMapPdk" parameterType="java.util.Map" resultType="java.util.LinkedHashMap">
+		SELECT * FROM (
+			SELECT ns.roomNumber,ns.createDate,ns.finalScore,u.nickName,ns.userid FROM newSumScore ns 
+			JOIN `user` u on ns.userid = u.id
+			where ns.roomNumber in (
+				 SELECT m.roomNumber FROM (
+						SELECT ns.roomNumber FROM newSumScore ns 
+						where ns.userid = #{userid}  
+						ORDER BY ns.createDate DESC
+						LIMIT  #{pageIndex},#{pageSize} 
+				) m
+			)AND ns.createDate = (
+						SELECT ns.createDate FROM newSumScore ns 
+						where ns.userid = #{userid} 
+						ORDER BY ns.createDate DESC
+						LIMIT  #{pageIndex},#{pageSize} 
+				)
+		) t
+	</select>
+	
+	
+	
+	
+	<select id="queryUserScoreById" parameterType="java.util.Map" resultType="java.util.LinkedHashMap">
+		select ss.roomNumber,u.nickName FROM sumScore ss 
+		JOIN `user` u on u.id = ss.userid
+		where ss.id = #{id}
+	</select>
+	
+	
+	<select id="findUserScoreByRoomId" parameterType="java.util.Map" resultType="java.util.LinkedHashMap">
+		select u.nickName,u.headimgurl,u.id from sumScore ss 
+		JOIN `user` u on ss.userid = u.id
+		where ss.roomNumber = #{roomId}
+	</select>
+	
+	<select id="selectUserScoreByCurrentRoomNumber" resultType="int" parameterType="UserScore">
+		SELECT IFNULL(SUM(us.score),0) as score FROM userScore us 
+		where us.userid = #{userid} 
+		and us.roomid = #{roomid}
+		ORDER BY us.id DESC
+	</select>
+	
+</mapper>
+     

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project-module
+  type="WEB"
+  name="loginFengTian"
+  id="myeclipse.1488181386320"
+  context-root="/loginFengTian"
+  j2ee-spec="6.0"
+  archive="loginFengTian.war">
+  <attributes>
+    <attribute name="webrootdir" value="WebRoot" />
+  </attributes>
+</project-module>
+

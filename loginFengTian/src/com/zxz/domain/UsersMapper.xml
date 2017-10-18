@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="UsersMapper">
+	<resultMap id="BaseResultMap" type="UsersMapper">
+		<id column="id" jdbcType="INTEGER" property="id" />
+		<result column="userid" jdbcType="INTEGER" property="userid" />
+		<result column="operateUserId" jdbcType="INTEGER" property="operateUserId" />
+		<result column="level" jdbcType="INTEGER" property="level" />
+		<result column="createDate" jdbcType="TIMESTAMP" property="createDate" />
+		<result column="unionid" jdbcType="VARCHAR" property="unionid" />
+	</resultMap>
+	<sql id="Base_Column_List">
+		id, userid, operateUserId, level, createDate, unionid
+	</sql>
+	<select id="selectByCondition" parameterType="UsersMapper"
+		resultType="UsersMapper">
+		select
+		<include refid="Base_Column_List" />
+		from UsersMapper where 1=1
+		<if test="userid != null">
+			and userid = #{userid}
+		</if>
+		<if test="unionid != null">
+			and unionid = #{unionid}
+		</if>
+	</select>
+
+	<select id="queryMyClub" parameterType="hashMap" resultType="java.util.LinkedHashMap">
+		SELECT m.operateUserId,m.notice,m.userName,t.total FROM (
+			SELECT us.operateUserId,COUNT(*) total FROM UsersMapper us where us.operateUserId  in (
+				SELECT us.operateUserId FROM UsersMapper us WHERE us.userid = #{userId}
+			)
+		)t JOIN (
+			SELECT us.operateUserId,zjop.notice,op.userName FROM UsersMapper us 
+			JOIN zjcardoperateuser zjop 
+			ON zjop.operateid = us.operateUserId
+			JOIN OperateUser op 
+			ON op.id = zjop.operateid
+			WHERE us.userid = #{userId}
+		) m ON t.operateUserId = m.operateUserId
+	</select>
+
+
+	<insert id="insert" parameterType="UsersMapper">
+		insert into UsersMapper (id, userid, operateUserId,
+		level, createDate, unionid
+		)
+		values (#{id,jdbcType=INTEGER}, #{userid,jdbcType=INTEGER},
+		#{operateUserId,jdbcType=INTEGER},
+		#{level,jdbcType=INTEGER}, #{createDate,jdbcType=TIMESTAMP}, #{unionid,jdbcType=VARCHAR}
+		)
+	</insert>
+
+	<insert id="insertSelective" parameterType="UsersMapper">
+		insert into UsersMapper
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				id,
+			</if>
+			<if test="userid != null">
+				userid,
+			</if>
+			<if test="operateUserId != null">
+				operateUserId,
+			</if>
+			<if test="level != null">
+				level,
+			</if>
+			<if test="createDate != null">
+				createDate,
+			</if>
+			<if test="unionid != null">
+				unionid,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				#{id,jdbcType=INTEGER},
+			</if>
+			<if test="userid != null">
+				#{userid,jdbcType=INTEGER},
+			</if>
+			<if test="operateUserId != null">
+				#{operateUserId,jdbcType=INTEGER},
+			</if>
+			<if test="level != null">
+				#{level,jdbcType=INTEGER},
+			</if>
+			<if test="createDate != null">
+				#{createDate,jdbcType=TIMESTAMP},
+			</if>
+			<if test="unionid != null">
+				#{unionid,jdbcType=VARCHAR},
+			</if>
+		</trim>
+	</insert>
+
+
+	 <select id="addUserCardByBangDingJuLeBu" parameterType="hashMap" statementType="CALLABLE" resultType="int">
+  		CALL addUserCardByBangDingJuLeBu(#{userId})
+  	 </select>
+
+</mapper>

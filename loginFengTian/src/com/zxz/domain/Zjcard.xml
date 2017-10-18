@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="Zjcard">
+  <resultMap id="BaseResultMap" type="com.zxz.domain.Zjcard">
+    <id column="userId" jdbcType="INTEGER" property="userid" />
+    <result column="roomCard" jdbcType="INTEGER" property="roomcard" />
+    <result column="createDate" jdbcType="TIMESTAMP" property="createdate" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    userId, roomCard, createDate,refreshToken
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultType="com.zxz.domain.Zjcard">
+    select * from zjcard
+    where userId = #{userid,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from zjcard
+    where userId = #{userid,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.zxz.domain.Zjcard">
+    insert into zjcard (userId, roomCard, createDate,refreshToken
+      )
+    values (#{userid}, #{roomcard}, #{createdate},#{refreshToken}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.zxz.domain.Zjcard">
+    insert into zjcard
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="userid != null">
+        userId,
+      </if>
+      <if test="roomcard != null">
+        roomCard,
+      </if>
+      <if test="createdate != null">
+        createDate,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="userid != null">
+        #{userid,jdbcType=INTEGER},
+      </if>
+      <if test="roomcard != null">
+        #{roomcard,jdbcType=INTEGER},
+      </if>
+      <if test="createdate != null">
+        #{createdate,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zxz.domain.Zjcard">
+    update zjcard
+    <set>
+      <if test="roomcard != null">
+        roomCard = #{roomcard,jdbcType=INTEGER},
+      </if>
+      <if test="createdate != null">
+        createDate = #{createdate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="refreshToken != null">
+        refreshToken = #{refreshToken},
+      </if>
+    </set>
+    where userId = #{userid,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zxz.domain.Zjcard">
+    update zjcard
+    set roomCard = #{roomcard,jdbcType=INTEGER},
+      createDate = #{createdate,jdbcType=TIMESTAMP}
+    where userId = #{userid,jdbcType=INTEGER}
+  </update>
+  
+  <select id="getTimeElse" parameterType="hashMap" resultType="java.util.LinkedHashMap">
+  	SELECT * FROM t_share ts where ts.userid = #{userId} ORDER BY ts.createdate DESC  LIMIT 1
+  </select>
+  
+  
+  <select id="fenxiangchenggong" parameterType="hashMap" statementType="CALLABLE" resultType="int">
+  		CALL addUserCardByFenXiang(#{userId})
+  </select>
+</mapper>

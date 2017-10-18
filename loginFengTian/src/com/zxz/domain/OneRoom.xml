@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="OneRoom">
+  <resultMap id="BaseResultMap" type="com.zxz.domain.OneRoom">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="total" jdbcType="INTEGER" property="total" />
+    <result column="zhama" jdbcType="INTEGER" property="zhama" />
+    <result column="createUserId" jdbcType="INTEGER" property="createuserid" />
+    <result column="roomNumber" jdbcType="VARCHAR" property="roomnumber" />
+    <result column="createDate" jdbcType="TIMESTAMP" property="createdate" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, total, zhama, createUserId, roomNumber, createDate
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from oneroom
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from oneroom
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.zxz.domain.OneRoom">
+    insert into oneroom (id, total, zhama, 
+      createUserId, roomNumber, createDate
+      )
+    values (#{id,jdbcType=INTEGER}, #{total,jdbcType=INTEGER}, #{zhama,jdbcType=INTEGER}, 
+      #{createuserid,jdbcType=INTEGER}, #{roomnumber,jdbcType=VARCHAR}, #{createdate,jdbcType=TIMESTAMP}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.zxz.domain.OneRoom">
+    insert into oneroom
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="total != null">
+        total,
+      </if>
+      <if test="zhama != null">
+        zhama,
+      </if>
+      <if test="createuserid != null">
+        createUserId,
+      </if>
+      <if test="roomnumber != null">
+        roomNumber,
+      </if>
+      <if test="createdate != null">
+        createDate,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="total != null">
+        #{total,jdbcType=INTEGER},
+      </if>
+      <if test="zhama != null">
+        #{zhama,jdbcType=INTEGER},
+      </if>
+      <if test="createuserid != null">
+        #{createuserid,jdbcType=INTEGER},
+      </if>
+      <if test="roomnumber != null">
+        #{roomnumber,jdbcType=VARCHAR},
+      </if>
+      <if test="createdate != null">
+        #{createdate,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zxz.domain.OneRoom">
+    update oneroom
+    <set>
+      <if test="total != null">
+        total = #{total,jdbcType=INTEGER},
+      </if>
+      <if test="zhama != null">
+        zhama = #{zhama,jdbcType=INTEGER},
+      </if>
+      <if test="createuserid != null">
+        createUserId = #{createuserid,jdbcType=INTEGER},
+      </if>
+      <if test="roomnumber != null">
+        roomNumber = #{roomnumber,jdbcType=VARCHAR},
+      </if>
+      <if test="createdate != null">
+        createDate = #{createdate,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zxz.domain.OneRoom">
+    update oneroom
+    set total = #{total,jdbcType=INTEGER},
+      zhama = #{zhama,jdbcType=INTEGER},
+      createUserId = #{createuserid,jdbcType=INTEGER},
+      roomNumber = #{roomnumber,jdbcType=VARCHAR},
+      createDate = #{createdate,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  
+  
+  <select id="selectOneRoomListTotal" parameterType="hashMap" resultType="java.lang.Integer">
+    select count(*) from oneroom  where 1=1
+    <if test="_parameter.containsKey('beginDate')">
+    	and oneroom.createDate &gt;= #{beginDate} 
+    </if>
+    <if test="_parameter.containsKey('endDate')">
+    	and oneroom.createDate &lt;= #{endDate} 
+    </if>
+  </select>
+  
+  <select id="selectRoomListMap" parameterType="hashMap" resultType="java.util.LinkedHashMap">
+   SELECT ro.*,u.id 'userId',u.nickName from oneroom ro
+	left JOIN `user` u on u.id = ro.createUserId
+	where 1=1
+	 <if test="_parameter.containsKey('nickName')">
+		and u.nickName LIKE '%${nickName}%'
+    </if>
+	 <if test="_parameter.containsKey('userId')">
+		and ro.createUserId = #{userId}
+    </if>
+	 <if test="_parameter.containsKey('roomNumber')">
+		and ro.roomNumber = #{roomNumber}
+    </if>
+     <if test="_parameter.containsKey('beginDate')">
+    	and ro.createDate &gt;= #{beginDate} 
+    </if>
+    <if test="_parameter.containsKey('endDate')">
+    	and ro.createDate &lt;= #{endDate} 
+    </if>
+    <if test="_parameter.containsKey('haveOrderby')">
+    	order by 1=1
+	    <if test="_parameter.containsKey('createDate')">
+	    	, ro.createDate ${createDate} 
+	    </if>
+    </if>
+	limit #{rowStart},#{pageSize}
+  </select>
+  
+  <select id="selectRoomListMapTotal" parameterType="hashMap" resultType="int">
+   SELECT count(*) from oneroom ro
+	left JOIN `user` u on u.id = ro.createUserId
+	where 1=1
+	 <if test="_parameter.containsKey('nickName')">
+		and u.nickName LIKE '%${nickName}%'
+    </if>
+	 <if test="_parameter.containsKey('userId')">
+		and ro.createUserId = #{userId}
+    </if>
+     <if test="_parameter.containsKey('roomNumber')">
+		and ro.roomNumber = #{roomNumber}
+    </if>
+     <if test="_parameter.containsKey('beginDate')">
+    	and ro.createDate &gt;= #{beginDate} 
+    </if>
+    <if test="_parameter.containsKey('endDate')">
+    	and ro.createDate &lt;= #{endDate} 
+    </if>
+  </select>
+  
+  <select id="findAllOperateChargeTotal" parameterType="hashMap" resultType="int">
+  	 SELECT IFNULL(sum(ocr.roomCard),0)  chargeTotal from operateChargeRecord ocr where ocr.type = 1
+  </select>
+  
+  <select id="findAllOperateRemainCardTotal" parameterType="hashMap" resultType="int">
+  	 SELECT SUM(ou.roomCard) remainCardTotal from OperateUser ou where ou.isDel = 0
+  </select>
+  
+  <select id="findAllOperateSendCardTotal" parameterType="hashMap" resultType="int">
+  	SELECT  IFNULL(SUM(ocr.sendCard),0) sendCardTotal from operateChargeRecord ocr where ocr.type = 1
+  </select>
+  
+  <select id="findAllUserCardTotal" parameterType="hashMap" resultType="int">
+  	 SELECT SUM(u.roomCard) from `user` u
+  </select>
+  
+  <select id="findAllOperateConsumeTotal" parameterType="hashMap" resultType="int">
+  	 SELECT IFNULL(sum(ocr.roomCard) ,0) consumeTotal  from operateChargeRecord ocr where ocr.type = 0
+  </select>
+  
+</mapper>

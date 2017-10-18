@@ -1,0 +1,308 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="OperateChargeRecord">
+  <resultMap id="BaseResultMap" type="com.zxz.domain.OperateChargeRecord">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="operateId" jdbcType="INTEGER" property="operateId" />
+    <result column="roomCard" jdbcType="INTEGER" property="roomCard" />
+    <result column="money" jdbcType="REAL" property="money" />
+    <result column="chargeOperateId" jdbcType="INTEGER" property="chargeOperateId" />
+    <result column="type" jdbcType="INTEGER" property="type" />
+    <result column="createDate" jdbcType="TIMESTAMP" property="createDate" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, operateId, roomCard, money, chargeOperateId, type, createDate
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from operateChargeRecord
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from operateChargeRecord
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.zxz.domain.OperateChargeRecord">
+    insert into operateChargeRecord (id, operateId, roomCard, 
+      money, chargeOperateId, type, 
+      createDate)
+    values (#{id,jdbcType=INTEGER}, #{operateid,jdbcType=INTEGER}, #{roomcard,jdbcType=INTEGER}, 
+      #{money,jdbcType=REAL}, #{chargeoperateid,jdbcType=INTEGER}, #{type,jdbcType=INTEGER}, 
+      #{createdate,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.zxz.domain.OperateChargeRecord">
+    insert into operateChargeRecord
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="operateid != null">
+        operateId,
+      </if>
+      <if test="roomcard != null">
+        roomCard,
+      </if>
+      <if test="money != null">
+        money,
+      </if>
+      <if test="chargeoperateid != null">
+        chargeOperateId,
+      </if>
+      <if test="type != null">
+        type,
+      </if>
+      <if test="createdate != null">
+        createDate,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="operateid != null">
+        #{operateid,jdbcType=INTEGER},
+      </if>
+      <if test="roomcard != null">
+        #{roomcard,jdbcType=INTEGER},
+      </if>
+      <if test="money != null">
+        #{money,jdbcType=REAL},
+      </if>
+      <if test="chargeoperateid != null">
+        #{chargeoperateid,jdbcType=INTEGER},
+      </if>
+      <if test="type != null">
+        #{type,jdbcType=INTEGER},
+      </if>
+      <if test="createdate != null">
+        #{createdate,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zxz.domain.OperateChargeRecord">
+    update operateChargeRecord
+    <set>
+      <if test="operateid != null">
+        operateId = #{operateid,jdbcType=INTEGER},
+      </if>
+      <if test="roomcard != null">
+        roomCard = #{roomcard,jdbcType=INTEGER},
+      </if>
+      <if test="money != null">
+        money = #{money,jdbcType=REAL},
+      </if>
+      <if test="chargeoperateid != null">
+        chargeOperateId = #{chargeoperateid,jdbcType=INTEGER},
+      </if>
+      <if test="type != null">
+        type = #{type,jdbcType=INTEGER},
+      </if>
+      <if test="createdate != null">
+        createDate = #{createdate,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zxz.domain.OperateChargeRecord">
+    update operateChargeRecord
+    set operateId = #{operateid,jdbcType=INTEGER},
+      roomCard = #{roomcard,jdbcType=INTEGER},
+      money = #{money,jdbcType=REAL},
+      chargeOperateId = #{chargeoperateid,jdbcType=INTEGER},
+      type = #{type,jdbcType=INTEGER},
+      createDate = #{createdate,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  
+  
+  
+   <!-- 查询用户充值记录 -->
+  <select id="selectUserRechargeRecord" parameterType="hashMap" resultType="java.util.LinkedHashMap">
+  	SELECT ou.id,ou.userName,ou.roomCard,ou.consumeCard,m.chargeTotal from OperateUser ou 
+	left JOIN consumeRecord cr on ou.id = cr.operateId
+	LEFT JOIN(
+		SELECT opr.chargeOperateId,SUM(opr.roomCard) chargeTotal from operateChargeRecord  opr
+		where opr.type = 0 
+		GROUP BY opr.chargeOperateId
+	) m
+	on ou.id = m.chargeOperateId
+	where 1=1
+	<if test="_parameter.containsKey('operateId')">
+		and ou.id=#{operateId}
+	</if>
+	<if test="_parameter.containsKey('userName')">
+		and ou.userName=#{userName}
+	</if>
+	<if test="_parameter.containsKey('haveOrderby')">
+    	order by 1=1
+	    <if test="_parameter.containsKey('roomCard')">
+	    	, roomCard ${roomCard}
+	    </if>
+    	<if test="_parameter.containsKey('consumeCard')">
+    	    , consumeCard ${consumeCard} 
+    	</if>
+    	<if test="_parameter.containsKey('chargeTotal')">
+    	    , chargeTotal ${chargeTotal} 
+    	</if>
+    </if>
+	LIMIT #{rowStart},#{pageSize}
+  </select>
+  
+  <!-- 查询用户充值记录数 -->
+  <select id="selectUserRechargeRecordCount" parameterType="hashMap" resultType="int">
+  	SELECT count(*) from OperateUser ou 
+	left JOIN consumeRecord cr on ou.id = cr.operateId
+	LEFT JOIN(
+		SELECT opr.chargeOperateId,SUM(opr.roomCard) chargeTotal from operateChargeRecord  opr
+		where opr.type = 0 
+		GROUP BY opr.chargeOperateId
+	) m
+	on ou.id = m.chargeOperateId
+	where 1=1
+	<if test="_parameter.containsKey('operateId')">
+		and ou.id=#{operateId}
+	</if>
+	<if test="_parameter.containsKey('userName')">
+		and ou.userName=#{userName}
+	</if>
+	<if test="_parameter.containsKey('haveOrderby')">
+    	order by 1=1
+	    <if test="_parameter.containsKey('roomCard')">
+	    	, roomCard ${roomCard}
+	    </if>
+    	<if test="_parameter.containsKey('consumeCard')">
+    	    , consumeCard ${consumeCard} 
+    	</if>
+    	<if test="_parameter.containsKey('chargeTotal')">
+    	    , chargeTotal ${chargeTotal} 
+    	</if>
+    </if>
+	LIMIT #{rowStart},#{pageSize}
+  </select>
+  
+  <!-- 代理查询自己的充值记录 -->
+  <select id="selectOperateChareRecord" parameterType="hashMap" resultType="java.util.LinkedHashMap">
+  	SELECT
+	ocr.*,
+	u.nickName
+	FROM
+		operateChargeRecord ocr
+	LEFT JOIN OperateUser ou ON ocr.operateId = ou.id
+	LEFT JOIN `user` u ON ocr.chargeOperateId = u.id
+	WHERE
+		ocr.operateId = #{operateId} 	
+		and ocr.type = 0
+		<if test="_parameter.containsKey('userId')">
+	    	and u.id = #{userId}
+	    </if>
+		<if test="_parameter.containsKey('nickName')">
+	    	and u.nickName = #{nickName}
+	    </if>
+		<if test="_parameter.containsKey('beginDate')">
+	    	and ocr.createDate &gt;= #{beginDate} 
+	    </if>
+	    <if test="_parameter.containsKey('endDate')">
+	    	and ocr.createDate &lt;= #{endDate} 
+	    </if>
+	ORDER BY 1=1
+	<if test="_parameter.containsKey('haveOrderby')">
+	    <if test="_parameter.containsKey('chargeCount')">
+	    	, ocr.roomCard ${chargeCount}
+	    </if>
+    </if>		
+	LIMIT #{rowStart},#{pageSize}	
+  </select>
+  
+  <!-- 代理查询充值记录总数 -->
+  <select id="selectOperateChareRecordTotal" parameterType="hashMap" resultType="int">
+  	SELECT
+		count(*)
+	FROM
+		operateChargeRecord ocr
+	LEFT JOIN OperateUser ou ON ocr.operateId = ou.id
+	LEFT JOIN `user` u ON ocr.chargeOperateId = u.id
+	WHERE
+		ocr.operateId = #{operateId} 	
+		and ocr.type = 0
+		<if test="_parameter.containsKey('userId')">
+	    	and u.id = #{userId}
+	    </if>
+		<if test="_parameter.containsKey('nickName')">
+	    	and u.nickName = #{nickName}
+	    </if>
+		<if test="_parameter.containsKey('beginDate')">
+	    	and ocr.createDate &gt;= #{beginDate} 
+	    </if>
+	    <if test="_parameter.containsKey('endDate')">
+	    	and ocr.createDate &lt;= #{endDate} 
+	    </if>
+	ORDER BY 1=1
+	<if test="_parameter.containsKey('haveOrderby')">
+	    <if test="_parameter.containsKey('chargeCount')">
+	    	, ocr.roomCard ${chargeCount}
+	    </if>
+    </if>		
+	
+  </select>
+  
+  <!--管理员查看充值记录  -->
+  <select id="selectChargeRecordByAdmin" parameterType="hashMap" resultType="java.util.LinkedHashMap">
+  	SELECT
+		ocr.*, ou.userName,ou.mobile
+	FROM
+		operateChargeRecord ocr
+	JOIN OperateUser ou ON ocr.operateId = ou.id
+	WHERE
+		ocr.type = 1
+	<if test="_parameter.containsKey('userId')">
+    	and ou.id = #{userId}
+    </if>
+	<if test="_parameter.containsKey('nickName')">
+    	and ou.userName = #{nickName}
+    </if>
+	<if test="_parameter.containsKey('beginDate')">
+    	and ocr.createDate &gt;= #{beginDate} 
+    </if>
+    <if test="_parameter.containsKey('endDate')">
+    	and ocr.createDate &lt;= #{endDate} 
+    </if>
+	ORDER BY 1=1
+	<if test="_parameter.containsKey('haveOrderby')">
+	    <if test="_parameter.containsKey('createDate')">
+	    	, ocr.createDate ${createDate}
+	    </if>
+    </if>
+	LIMIT #{rowStart},#{pageSize}	
+  </select>
+  
+  <!--管理员查看充值记录总数  -->
+  <select id="selectChargeRecordByAdminCount" parameterType="hashMap" resultType="int">
+  	SELECT
+		count(*)
+	FROM
+		operateChargeRecord ocr
+	JOIN OperateUser ou ON ocr.operateId = ou.id
+	WHERE
+		ocr.type = 1
+	<if test="_parameter.containsKey('userId')">
+    	and ou.id = #{userId}
+    </if>
+	<if test="_parameter.containsKey('nickName')">
+    	and ou.userName = #{nickName}
+    </if>
+	<if test="_parameter.containsKey('beginDate')">
+    	and ocr.createDate &gt;= #{beginDate} 
+    </if>
+    <if test="_parameter.containsKey('endDate')">
+    	and ocr.createDate &lt;= #{endDate} 
+    </if>
+	ORDER BY 1=1
+	<if test="_parameter.containsKey('haveOrderby')">
+	    <if test="_parameter.containsKey('createDate')">
+	    	, ocr.createDate ${createDate}
+	    </if>
+    </if>
+  </select>
+  
+</mapper>

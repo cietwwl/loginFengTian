@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="AppVersion">
+	<resultMap id="BaseResultMap" type="AppVersion">
+		<id column="id" jdbcType="INTEGER" property="id" />
+		<result column="versionNumber" jdbcType="VARCHAR" property="versionNumber" />
+		<result column="discription" jdbcType="VARCHAR" property="discription" />
+		<result column="downloadUrl" jdbcType="VARCHAR" property="downloadUrl" />
+		<result column="force" jdbcType="INTEGER" property="force" />
+	</resultMap>
+	<sql id="Base_Column_List">
+		id, versionNumber, discription, downloadUrl, force
+	</sql>
+	<select id="selectByPrimaryKey" parameterType="java.lang.Integer"
+		resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from appVersion
+		where id = #{id,jdbcType=INTEGER}
+	</select>
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+		delete from appVersion
+		where id = #{id,jdbcType=INTEGER}
+	</delete>
+	<insert id="insert" parameterType="com.zxz.domain.AppVersion">
+		insert into appVersion (id, versionNumber, discription,
+		downloadUrl, force)
+		values (#{id,jdbcType=INTEGER}, #{versionnumber,jdbcType=VARCHAR},
+		#{discription,jdbcType=VARCHAR},
+		#{downloadurl,jdbcType=VARCHAR}, #{force,jdbcType=INTEGER})
+	</insert>
+	<insert id="insertSelective" parameterType="com.zxz.domain.AppVersion">
+		insert into appVersion
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				id,
+			</if>
+			<if test="versionnumber != null">
+				versionNumber,
+			</if>
+			<if test="discription != null">
+				discription,
+			</if>
+			<if test="downloadurl != null">
+				downloadUrl,
+			</if>
+			<if test="force != null">
+				force,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				#{id,jdbcType=INTEGER},
+			</if>
+			<if test="versionnumber != null">
+				#{versionnumber,jdbcType=VARCHAR},
+			</if>
+			<if test="discription != null">
+				#{discription,jdbcType=VARCHAR},
+			</if>
+			<if test="downloadurl != null">
+				#{downloadurl,jdbcType=VARCHAR},
+			</if>
+			<if test="force != null">
+				#{force,jdbcType=INTEGER},
+			</if>
+		</trim>
+	</insert>
+	<update id="updateByPrimaryKeySelective" parameterType="com.zxz.domain.AppVersion">
+		update appVersion
+		<set>
+			<if test="versionnumber != null">
+				versionNumber = #{versionnumber,jdbcType=VARCHAR},
+			</if>
+			<if test="discription != null">
+				discription = #{discription,jdbcType=VARCHAR},
+			</if>
+			<if test="downloadurl != null">
+				downloadUrl = #{downloadurl,jdbcType=VARCHAR},
+			</if>
+			<if test="force != null">
+				force = #{force,jdbcType=INTEGER},
+			</if>
+		</set>
+		where id = #{id,jdbcType=INTEGER}
+	</update>
+	<update id="updateByPrimaryKey" parameterType="com.zxz.domain.AppVersion">
+		update appVersion
+		set versionNumber = #{versionnumber,jdbcType=VARCHAR},
+		discription = #{discription,jdbcType=VARCHAR},
+		downloadUrl = #{downloadurl,jdbcType=VARCHAR},
+		force = #{force,jdbcType=INTEGER}
+		where id = #{id,jdbcType=INTEGER}
+	</update>
+
+	<select id="selectListByMap" parameterType="hashMap" resultType="AppVersion">
+		SELECT * FROM appVersion a
+		limit #{rowStart},#{pageSize}
+	</select>
+
+
+</mapper>

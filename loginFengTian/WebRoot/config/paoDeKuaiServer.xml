@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<servers>
+	<server id="1">		
+		<ip>47.93.37.202</ip>
+		<rpcPort>19999</rpcPort>
+	</server>
+</servers>
